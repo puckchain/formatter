@@ -1,0 +1,178 @@
+<html>
+<head></head>
+<style>
+
+    #EditorContainer {
+        width: 800px;
+        display: block;
+        margin: 20px auto;
+        border: 1px solid #ddd;
+    }
+
+    #Editor {
+        outline: none;
+        user-select: all;
+    }
+
+    #Editor .row {
+        height: 25px;
+        user-select: all;
+    }
+
+    #Editor .row .line_content {
+        display: inline-block;
+        outline: none;
+        margin-left: 20px;
+        user-select: all;
+        width: 95%;
+    }
+
+    #Editor .row .line_content.line_content_focus {
+        background: #eee;
+    }
+
+    #Editor .row .line_number {
+        display: inline-block;
+        color: #aaa;
+        margin-left: -20px;
+        user-select: none;
+    }
+
+    .token {
+        display: inline-block;
+        font-size: 15px;
+        color: #888;
+    }
+
+    .token.token-Operator {
+        color: #6495ed;
+    }
+
+    .token.token-DoubleOperator {
+        color: #0047c5;
+    }
+
+    .token.token-Symbol {
+        color: #1f355d;
+    }
+
+    .token.token-Whitespace {
+        color: #6495ed;
+    }
+
+    .token.token-LineFeed {
+        color: #d367d3;
+    }
+
+    .token.token-Keyword {
+        color: #d6440c;
+    }
+
+    .token.token-Identifier {
+        /*color: #a9a9a9;*/
+        color: #8e8989;
+    }
+
+    .token.token-Number {
+        color: #08964e;
+    }
+
+    .token.token-Float {
+        color: #03522a;
+    }
+
+    .token.token-String {
+        color: #d68e0a;
+    }
+
+    .token.token-Char {
+        color: #f7be56;
+    }
+</style>
+<body>
+<div id="EditorContainer">
+    <pre id="Editor" contenteditable='true'></pre>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/2.2.0/jquery.js"></script>
+<script src="https://raw.github.com/WGrape/lexer/main/package/c-lexer.min.js"></script>
+<script src="index.js"></script>
+<script>
+    document.execCommand('InsertHTML', true, 'SBSBS');
+    let dom = "";
+    let data = core.format("int main(12,23);\n int main(){int a");
+    for (let item of data) {
+        let row = "<pre class='row row-" + item.line + "'>";
+
+        // fill line number
+        row += ("<div class='line_number' contenteditable='false'>" + item.line + "</div>");
+
+        // fill blocks
+        let blocks = item.blocks;
+        row += "<pre class='line_content' contenteditable='true'>";
+        let whitespaces = "&nbsp;".repeat(item.indent * 4);
+        row += (whitespaces);
+        for (let block of blocks) {
+            row += ("<span class='token token-" + block.token.type + "'>" + block.content.replace(/ /, '&nbsp;').replace(/\n/, '&ZeroWidthSpace;') + "</span>");
+        }
+        row += "</pre>";
+        row += "</pre>";
+
+        dom += row;
+    }
+    $("#Editor").html(dom);
+
+    let delKeyCode = 8, enterKeyCode = 13, upKeyCode = 38, downKeyCode = 40;
+    $('body').on("keydown", '#Editor', function (event) {
+        return;
+    });
+
+    $('body').on("keydown", '.line_content.line_content_focus', function (event) {
+        if (event.keyCode === delKeyCode) {
+            if (!$(this).html()) {
+                alert('到头');
+                $(this).parent().prev().find(".line_content").focus().addClass('line_content_focus');
+                $(this).parent().remove();
+            }
+        } else if (event.keyCode === enterKeyCode) {
+            alert()
+            let lineNumber = $(this).parent().index() + 2;
+            $(this).parent().after("<div class='row row-" + lineNumber + "'><div class='line_number' contenteditable='false'>" + lineNumber + "</div><pre class='line_content' contenteditable='true'></pre></div>");
+            $(".line_content").removeClass('line_content_focus');
+            $(this).parent().next().find(".line_content").focus().addClass('line_content_focus');
+            adjustLineNumbers();
+            return false;
+        } else if (event.keyCode === upKeyCode) {
+            $(".line_content").removeClass('line_content_focus');
+            $(this).parent().prev().find(".line_content").focus().addClass('line_content_focus');
+        } else if (event.keyCode === downKeyCode) {
+            $(".line_content").removeClass('line_content_focus');
+            $(this).parent().next().find(".line_content").focus().addClass('line_content_focus');
+        }
+        adjustLineNumbers();
+   });
+
+    function adjustLineNumbers() {
+        $(".row").each(function (lineNumber) {
+            ++lineNumber;
+            $(this).removeClass().addClass('row row-'+lineNumber);
+            $(this).find('.line_number').html(lineNumber);
+        });
+    }
+
+    $('.line_content').on('click', function () {
+        $(".line_content").removeClass('line_content_focus');
+        $(this).addClass('line_content_focus');
+    });
+
+    $('.line_content').on('focus', function () {
+        $(".line_content").removeClass('line_content_focus');
+        $(this).addClass('line_content_focus');
+    });
+
+    $('.line_content').on('blur', function () {
+        $(".line_content").removeClass('line_content_focus');
+    });
+
+</script>
+</body>
+</html>
