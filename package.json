@@ -1,0 +1,25 @@
+{
+  "name": "chain-formatter",
+  "version": "0.0.1",
+  "description": "A javascript component of puckchain to format codes",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:unit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puckchain/formatter.git"
+  },
+  "keywords": [
+    "code-format",
+    "format",
+    "code-style",
+    "formatter"
+  ],
+  "author": "WGrape",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/puckchain/formatter/issues"
+  },
+  "homepage": "https://github.com/puckchain/formatter#readme"
+}

@@ -1,5 +1,5 @@
 let config = {
-    "language": "c",
+    "language": "sql",
     "colors": {
         "default": "#888",
         "Operator": "#6495ed",
@@ -40,12 +40,6 @@ let tool = {
     isSet(key, obj) {
         return typeof obj[key] !== 'undefined';
     },
-    peekToken(tokens, index) {
-        if (index > tokens.length - 1) {
-            throw new Error("token index out of range");
-        }
-        return tokens[index];
-    },
     preHandleTokens(tokens) {
         let stack = [];
         let length = tokens.length;
@@ -81,6 +75,11 @@ let core = {
         if (config.language === 'c') {
             lexer = chainLexer.cLexer;
         }
+
+        lexer.setConfig({
+            ignoreTokens: [],
+            ignoreValues: [],
+        });
     },
     traverseTokens(tokens) {
         let result = [];
@@ -93,19 +92,7 @@ let core = {
             let tokenValue = token.value;
             let tokenType = token.type;
             let content = '';
-            if (tokenType === 'Operator' || tokenType === 'DoubleOperator') {
-                content = (" " + tokenValue + " ");
-            } else if (tokenType === 'Symbol') {
-                if (tokenValue === ',') {
-                    content = (tokenValue + ' ');
-                } else {
-                    content = tokenValue;
-                }
-            } else if (tokenType === 'Keyword') {
-                content = (tokenValue + ' ');
-            } else {
                 content = tokenValue;
-            }
             code += content;
             blocks.push({
                 'content': content,
